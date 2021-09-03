@@ -21,7 +21,42 @@ RSpec.describe ActiveProcedure::ModelConcerns do
 
     it "passes in options" do
       subject.options = { name: 'foo bar' }
-      expect(subject.build_model.name).to eq('foo bar')
+      expect(Foo).to receive(:new).with(name: 'foo bar')
+      subject.build_model
+    end
+  end
+
+  describe '#validate_model!' do
+    let(:model) { double }
+    it "returns true if valid" do
+      expect(model).to receive(:valid?).and_return(true)
+      expect(subject).to receive(:model).and_return(model)
+
+      expect(subject.validate_model!).to be true
+    end
+
+    it "raises if not valid" do
+      expect(model).to receive(:valid?).and_return(false)
+      expect(subject).to receive(:model).and_return(model)
+
+      expect{subject.validate_model!}.to raise_error(ActiveProcedure::InvalidModelError)
+    end
+  end
+
+  describe '#save_model!' do
+    let(:model) { double }
+    it "returns true if save! succeeds" do
+      expect(model).to receive(:save!).and_return(true)
+      expect(subject).to receive(:model).and_return(model)
+
+      expect(subject.save_model).to be true
+    end
+
+    it "raises if not save does" do
+      expect(model).to receive(:save!).and_raise(StandardError)
+      expect(subject).to receive(:model).and_return(model)
+
+      expect{subject.save_model}.to raise_error(ActiveProcedure::SaveModelError)
     end
   end
 end

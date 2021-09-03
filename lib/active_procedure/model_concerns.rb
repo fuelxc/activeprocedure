@@ -19,18 +19,18 @@ module ActiveProcedure
     end
 
     def build_model
-      @model = model_klass.new(*options)
+      @model = model_klass.new(**(options || {}))
     end
 
     def validate_model!
-      errored!("#{model_klass_name} is not valid") unless model.valid?
+      raise ActiveProcedure::InvalidModelError.new("#{model_klass_name} is not valid") unless model.valid?
+      true
     end
 
     def save_model
       model.save!
     rescue => e
-      #do rollback
-      errored!("Save #{model_klass_name}: #{e.message}")
+      raise ActiveProcedure::SaveModelError.new("Save #{model_klass_name}: #{e.message}")
     end
 
     private

@@ -9,5 +9,7 @@ require_relative "active_procedure/update"
 
 module ActiveProcedure
   class Error < StandardError; end
-  # Your code goes here...
+  class InvalidModelError < Error; end
+  class SaveModelError < Error; end
+  class DeleteModelError < Error; end
 end
